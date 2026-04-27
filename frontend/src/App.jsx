@@ -29,7 +29,7 @@ const App = () => {
         </button>
       </nav>
 
-      <main>
+      <main id="main-content">
         {/* Hero: The Vision */}
         <Hero onChat={() => setIsChatOpen(true)} onViewProcess={scrollToProcess} />
         
@@ -49,9 +49,10 @@ const App = () => {
         )}
       </AnimatePresence>
 
-      <footer className="main-footer">
-        <p>ELECTION GUIDE - YOUR DEMOCRACY COMPANION</p>
-        <p>© 2026 Powered by Vertex AI</p>
+      <footer className="main-footer" role="contentinfo">
+        <p>voter.ai — Your Personal Election Guide</p>
+        <p>A Project for <strong>Hack2Skill PromptWars Virtual</strong></p>
+        <p>© 2026 Powered by Vertex AI | Gemini 2.5 Flash</p>
       </footer>
     </div>
   );

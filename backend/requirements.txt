@@ -1,13 +1,11 @@
 fastapi
-uvicorn
+uvicorn[standard]
 google-cloud-firestore
-google-generativeai
 google-cloud-storage
 google-cloud-logging
-google-cloud-secret-manager
 google-cloud-aiplatform
 pydantic
 python-dotenv
-cors
 pytest
 pytest-asyncio
+httpx

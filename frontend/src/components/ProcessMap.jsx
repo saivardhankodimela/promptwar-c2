@@ -18,6 +18,9 @@ const ProcessMap = ({ onChat }) => {
       <h2 id="process-heading">
         The Full Election <span>Lifecycle</span>
       </h2>
+      <p style={{ textAlign: 'center', color: 'var(--text-gray)', marginTop: '-3rem', marginBottom: '4rem', fontSize: '1.2rem' }}>
+        Master the 8-Step Journey of Indian Democracy
+      </p>
       
       {/* 8-Step Grid */}
       <div className="process-grid">

@@ -14,7 +14,7 @@ const Hero = ({ onChat, onViewProcess }) => {
           voter.<span>ai</span> | <br /> ELECTION GUIDE
         </h1>
         <p className="hero-description">
-          Confused about voting? I'm here to help. Get instant answers on registration, locations, and your rights in a simple chat.
+          Confused about voting in India? I'm your dedicated AI guide for the 8-step election lifecycle. Get instant, verified answers on registration, myths, and your rights.
         </p>
         <div className="hero-actions">
           <button 

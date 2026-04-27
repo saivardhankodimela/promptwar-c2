@@ -34,6 +34,26 @@ h1, h2, h3, h4, .brand {
   flex-direction: column;
 }
 
+/* Accessibility: Skip-to-content link for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--netflix-red);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0 0 8px 8px;
+  z-index: 9999;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
 .header {
   padding: 1rem 4%;
   display: flex;
