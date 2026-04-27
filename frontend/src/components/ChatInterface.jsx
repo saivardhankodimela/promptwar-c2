@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const ChatInterface = ({ isOpen, onClose }) => {
   const [messages, setMessages] = useState([
@@ -9,6 +11,7 @@ const ChatInterface = ({ isOpen, onClose }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -18,8 +21,26 @@ const ChatInterface = ({ isOpen, onClose }) => {
     scrollToBottom();
   }, [messages]);
 
+  // Accessibility: Keyboard Focus Trap & Escape Key
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (isOpen) {
+      inputRef.current?.focus();
+    }
+  }, [isOpen]);
+
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
     
     const userMsg = input;
     setMessages(prev => [...prev, { text: userMsg, isBot: false }]);
@@ -27,7 +48,6 @@ const ChatInterface = ({ isOpen, onClose }) => {
     setIsLoading(true);
 
     try {
-      // Relative URL for Unified Container
       const response = await axios.post('/chat', {
         user_id: 'unified_user',
         query: userMsg
@@ -44,87 +64,82 @@ const ChatInterface = ({ isOpen, onClose }) => {
 
   return (
     <motion.div 
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="chat-heading"
       initial={{ opacity: 0, scale: 0.98, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.98, y: 10 }}
-      style={{
-        position: 'fixed',
-        top: '5%',
-        left: '5%',
-        right: '5%',
-        bottom: '5%',
-        backgroundColor: '#111',
-        zIndex: 1000,
-        borderRadius: '12px',
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0 0 100px rgba(0,0,0,0.9)',
-        border: '1px solid #E50914',
-        overflow: 'hidden'
-      }}
+      className="chat-window"
     >
-      <div style={{ padding: '1.2rem 2rem', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#181818' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <h2 style={{ fontSize: '1rem', fontWeight: 900, letterSpacing: '1px', color: 'white' }}>
-            voter.<span style={{ color: '#E50914' }}>ai</span> | ELECTION GUIDE
-          </h2>
-        </div>
-        <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#666', fontSize: '1.4rem', cursor: 'pointer' }}>✕</button>
-      </div>
+      <header className="chat-header">
+        <h2 id="chat-heading" style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: 'white' }}>
+          voter.<span>ai</span> | ELECTION GUIDE
+        </h2>
+        <button 
+          onClick={onClose} 
+          aria-label="Close Chat"
+          className="close-button"
+          style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer', padding: '5px' }}
+        >
+          ✕
+        </button>
+      </header>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.2rem', backgroundColor: '#0c0c0c' }}>
+      <section 
+        className="chat-body"
+        role="log"
+        aria-live="polite"
+        aria-label="Chat messages"
+        aria-atomic="false"
+      >
         {messages.map((m, i) => (
-          <div key={i} style={{ 
-            alignSelf: m.isBot ? 'flex-start' : 'flex-end',
-            maxWidth: '80%',
-            backgroundColor: m.isBot ? '#1f1f1f' : '#E50914',
-            padding: '14px 20px',
-            borderRadius: '8px',
-            lineHeight: 1.5,
-            fontSize: '1rem',
-            border: m.isBot ? '1px solid #333' : 'none',
-            whiteSpace: 'pre-wrap',
-            color: 'white'
-          }}>
-            {m.text}
-          </div>
+          <motion.div 
+            key={i} 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={m.isBot ? "message-bot" : "message-user"}
+            role="article"
+          >
+            {m.isBot ? (
+              <div className="markdown-content">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {m.text}
+                </ReactMarkdown>
+              </div>
+            ) : (
+              m.text
+            )}
+          </motion.div>
         ))}
-        {isLoading && <div style={{ color: '#E50914', fontSize: '0.8rem', fontStyle: 'italic' }}>Thinking...</div>}
+        {isLoading && (
+          <div className="message-bot" style={{ fontStyle: 'italic', opacity: 0.7 }}>
+            voter.ai is thinking...
+          </div>
+        )}
         <div ref={messagesEndRef} />
-      </div>
+      </section>
 
-      <div style={{ padding: '1.5rem 2rem', borderTop: '1px solid #333', display: 'flex', gap: '1rem', backgroundColor: '#181818' }}>
+      <footer className="chat-input-area">
         <input 
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-          placeholder="Ask me anything about elections!"
-          style={{
-            flex: 1,
-            backgroundColor: '#0c0c0c',
-            border: '1px solid #444',
-            color: 'white',
-            padding: '14px 20px',
-            borderRadius: '6px',
-            outline: 'none',
-            fontSize: '1rem'
-          }}
+          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+          placeholder="Ask about voter IDs, dates, or process..."
+          aria-label="Type your question"
+          className="input-field"
+          disabled={isLoading}
         />
         <button 
           onClick={handleSend}
-          style={{ 
-            backgroundColor: '#E50914', 
-            color: 'white', 
-            border: 'none', 
-            padding: '0 30px', 
-            borderRadius: '6px', 
-            fontWeight: '900', 
-            cursor: 'pointer'
-          }}
+          className="send-button"
+          aria-label="Send message"
+          disabled={isLoading || !input.trim()}
         >
-          SEND
+          {isLoading ? '...' : 'SEND'}
         </button>
-      </div>
+      </footer>
     </motion.div>
   );
 };

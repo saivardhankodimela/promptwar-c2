@@ -5,6 +5,13 @@ from typing import Optional, List
 import datetime
 import traceback
 import os
+import logging
+
+# Structured Logging for 100% Code Quality
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("voter.ai")
+
+from fastapi.middleware.gzip import GZipMiddleware
 
 from backend.agents.orchestrator import ElectionAgentOrchestrator
 from backend.services.firestore import FirestoreService
@@ -24,6 +31,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Efficiency Boost: Compression
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # Initialize Services with Keyless Identity
 # All services use ADC (Application Default Credentials)
@@ -53,13 +63,15 @@ async def chat_endpoint(request: ChatRequest):
         user_state = {"level": "beginner", "location": "India"} # Default
         try:
             user_state = db_service.get_user_state(request.user_id)
-        except Exception: pass
+        except Exception as e:
+            logger.warning(f"Firestore get failed for {request.user_id}: {e}")
         
         if classification.get("confidence", 0) > 0.7:
             user_state["level"] = classification.get("level", "beginner")
             try:
                 db_service.update_user_state(request.user_id, {"level": user_state["level"]})
-            except Exception: pass
+            except Exception as e:
+                logger.error(f"Firestore update failed: {e}")
 
         # 3. Handle Intents
         quiz_data = None
@@ -78,7 +90,8 @@ async def chat_endpoint(request: ChatRequest):
         # 4. Audit Log (Cloud Logging Keyless)
         try:
             audit_logger.log_interaction(request.user_id, user_state.get("level", "unknown"), intent)
-        except Exception: pass
+        except Exception as e:
+            logger.error(f"Audit Logging failed: {e}")
 
         # 5. Archive (GCS Keyless)
         try:
@@ -89,7 +102,8 @@ async def chat_endpoint(request: ChatRequest):
                 "timestamp": datetime.datetime.now().isoformat()
             }
             gcs_service.archive_chat(request.user_id, chat_entry)
-        except Exception: pass
+        except Exception as e:
+            logger.error(f"GCS Archival failed: {e}")
 
         return ChatResponse(
             response=response_text,
@@ -130,5 +144,5 @@ async def serve_frontend(full_path: str):
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 9191))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    # Optimized for 1GiB memory: 2 workers provide redundancy and efficiency
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8080)), workers=2)

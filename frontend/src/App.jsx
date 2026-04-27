@@ -13,47 +13,45 @@ const App = () => {
   };
 
   return (
-    <div style={{ backgroundColor: '#141414', minHeight: '100vh', width: '100%' }}>
+    <div className="app-container">
       {/* Unified Navbar */}
-      <nav style={{ 
-        position: 'fixed', 
-        top: 0, 
-        width: '100%', 
-        padding: '20px 4%', 
-        background: 'rgba(20, 20, 20, 0.95)',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        zIndex: 100,
-        borderBottom: '1px solid #333'
-      }}>
-        <div style={{ fontSize: '1.8rem', fontWeight: 900, letterSpacing: '-1px', color: 'white' }}>
-          ELECTION <span style={{ color: '#E50914' }}>GUIDE</span>
+      <nav className="header" role="navigation" aria-label="Main Navigation">
+        <div className="brand" aria-label="voter.ai">
+          voter.<span>ai</span>
         </div>
         <button 
           onClick={() => setIsChatOpen(true)}
-          style={{ background: '#E50914', border: 'none', color: 'white', padding: '10px 24px', borderRadius: '4px', fontWeight: 'bold', cursor: 'pointer', fontSize: '0.9rem' }}
+          className="send-button"
+          aria-label="Start chat with election guide"
+          style={{ padding: '8px 20px', fontSize: '0.9rem' }}
         >
           CHAT WITH GUIDE
         </button>
       </nav>
 
-      {/* Hero: The Vision */}
-      <Hero onChat={() => setIsChatOpen(true)} onViewProcess={scrollToProcess} />
-      
-      {/* The 8-Step Lifecycle Roadmap */}
-      <div ref={processRef}>
-        <ProcessMap onChat={() => setIsChatOpen(true)} />
-      </div>
+      <main>
+        {/* Hero: The Vision */}
+        <Hero onChat={() => setIsChatOpen(true)} onViewProcess={scrollToProcess} />
+        
+        {/* The 8-Step Lifecycle Roadmap */}
+        <div ref={processRef} id="process-section">
+          <ProcessMap onChat={() => setIsChatOpen(true)} />
+        </div>
+      </main>
 
       {/* The Master Agent Interface Modal */}
       <AnimatePresence>
-        {isChatOpen && <ChatInterface isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />}
+        {isChatOpen && (
+          <ChatInterface 
+            isOpen={isChatOpen} 
+            onClose={() => setIsChatOpen(false)} 
+          />
+        )}
       </AnimatePresence>
 
-      <footer style={{ padding: '60px 4%', backgroundColor: '#000', color: '#444', fontSize: '0.8rem', textAlign: 'center' }}>
-        <p style={{ marginBottom: '0.5rem', color: '#888' }}>ELECTION GUIDE - YOUR DEMOCRACY COMPANION</p>
-        <p>© 2026 Powered by Vertex AI Mumbai (asia-south1)</p>
+      <footer className="main-footer">
+        <p>ELECTION GUIDE - YOUR DEMOCRACY COMPANION</p>
+        <p>© 2026 Powered by Vertex AI</p>
       </footer>
     </div>
   );
