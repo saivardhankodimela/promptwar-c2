@@ -1,0 +1,8 @@
+**/node_modules
+**/dist
+.git
+.venv
+.env
+Dockerfile
+README.md
+**/package-lock.json

@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+
+:root {
+  --netflix-red: #E50914;
+  --netflix-black: #141414;
+  --netflix-gray: #181818;
+  --netflix-light-gray: #2f2f2f;
+  --text-white: #ffffff;
+  --text-gray: #b3b3b3;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--netflix-black);
+  color: var(--text-white);
+  overflow-x: hidden;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--netflix-black);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--netflix-light-gray);
+  border-radius: 5px;
+}
+
+/* Netflix Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.btn-netflix {
+  background-color: var(--netflix-red);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-netflix:hover {
+  background-color: #ff0a16;
+  transform: scale(1.05);
+}
+
+.btn-secondary {
+  background-color: rgba(109, 109, 110, 0.7);
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(109, 109, 110, 1);
+}
