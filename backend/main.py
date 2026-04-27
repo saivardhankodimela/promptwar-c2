@@ -14,7 +14,7 @@ from backend.services.audit_logging import AuditLogger
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
-app = FastAPI(title="VOTER.AI - UNIFIED EDITION")
+app = FastAPI(title="voter.ai - ELECTION GUIDE")
 
 # Enable CORS
 app.add_middleware(
@@ -107,6 +107,10 @@ async def chat_endpoint(request: ChatRequest):
             intent="error"
         )
 
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "mode": "unified-keyless", "brand": "voter.ai"}
+
 # --- UNIFIED FRONTEND SERVING ---
 # Mount the static files (compiled React app)
 # Note: In the container, these will be in /app/dist
@@ -122,11 +126,7 @@ async def serve_frontend(full_path: str):
     index_path = os.path.join("dist", "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return {"message": "VOTER.AI Backend is running. Frontend build not found."}
-
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "mode": "unified-keyless"}
+    return {"message": "voter.ai Backend is running. Frontend build not found."}
 
 if __name__ == "__main__":
     import uvicorn

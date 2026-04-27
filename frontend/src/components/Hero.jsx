@@ -21,7 +21,7 @@ const Hero = ({ onChat, onViewProcess }) => {
         className="hero-content"
       >
         <h1 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '-2px' }}>
-          Your Personal <br /> <span style={{ color: '#E50914' }}>Election Guide</span>
+          voter.<span style={{ color: '#E50914' }}>ai</span> | <br /> ELECTION GUIDE
         </h1>
         <p style={{ fontSize: '1.2rem', maxWidth: '550px', marginBottom: '2rem', color: '#e5e5e5', lineHeight: 1.4 }}>
           Confused about voting? I'm here to help. Get instant answers on registration, locations, and your rights in a simple chat.

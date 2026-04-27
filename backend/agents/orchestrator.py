@@ -31,9 +31,34 @@ class ElectionAgentOrchestrator:
             print(f"Vertex AI Identity Init failed: {e}")
             self.model = None
 
+    def _sanitize_query(self, query: str) -> str:
+        """Adversarial Filter: Blocks common jailbreak and injection attempts."""
+        # 1. Length Cap (Prevent complex injection payloads)
+        if len(query) > 500:
+            return "ERROR: Query exceeds the safety length limit."
+            
+        # 2. Jailbreak Keywords (Red Hat Blocklist)
+        blocklist = [
+            "ignore previous instructions",
+            "ignore all instructions",
+            "print your system prompt",
+            "you are now a hacker",
+            "jailbreak",
+            "system instructions",
+            "who is your master",
+            "bypass safety"
+        ]
+        
+        lower_query = query.lower()
+        for phrase in blocklist:
+            if phrase in lower_query:
+                return "ERROR: Your query contains unauthorized instructions."
+                
+        return query
+
     async def _generate(self, prompt, is_json=False):
         if not self.model:
-            return "I'm having trouble connecting to my cloud brain. Ensure you've run 'gcloud auth application-default login'."
+            return "I'm having trouble connecting to my cloud brain."
         
         try:
             # Identity-based generation
@@ -47,7 +72,12 @@ class ElectionAgentOrchestrator:
             return "My cloud connection is currently blocked. Please check your GCP permissions."
 
     async def classify_user(self, query):
-        prompt = USER_CLASSIFIER_PROMPT.format(query=query)
+        # Sanitize raw user input first
+        clean_query = self._sanitize_query(query)
+        if clean_query.startswith("ERROR:"):
+            return {"level": "beginner", "intent": "error", "error": clean_query}
+
+        prompt = USER_CLASSIFIER_PROMPT.format(query=clean_query)
         res_text = await self._generate(prompt, is_json=True)
         try:
             start = res_text.find('{')
@@ -57,13 +87,21 @@ class ElectionAgentOrchestrator:
             return {"level": "beginner", "intent": "learn", "topic": "general", "confidence": 0.5}
 
     async def get_adaptive_response(self, query, user_state):
-        classification = await self.classify_user(query)
+        # Sanitize raw user input
+        clean_query = self._sanitize_query(query)
+        if clean_query.startswith("ERROR:"):
+            return clean_query
+
+        classification = await self.classify_user(clean_query)
+        if classification.get("intent") == "error":
+            return classification.get("error")
+
         prompt = ADAPTIVE_EXPLAINER_PROMPT.format(
             level=classification.get("level", "beginner"),
             location="India",
             progress="N/A",
             current_step="N/A",
-            query=query
+            query=clean_query
         )
         return await self._generate(prompt)
 
@@ -78,7 +116,12 @@ class ElectionAgentOrchestrator:
             return []
 
     async def check_myth(self, statement):
-        prompt = MYTH_FACT_PROMPT.format(statement=statement)
+        # Sanitize raw user input
+        clean_statement = self._sanitize_query(statement)
+        if clean_statement.startswith("ERROR:"):
+            return {"is_myth": False, "correction": clean_statement, "source_reference": ""}
+
+        prompt = MYTH_FACT_PROMPT.format(statement=clean_statement)
         res_text = await self._generate(prompt, is_json=True)
         try:
             start = res_text.find('{')

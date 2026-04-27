@@ -5,8 +5,8 @@ from google.cloud import storage
 class GCSService:
     def __init__(self):
         self.client = None
-        project_id = os.getenv("GCP_PROJECT_ID")
-        self.bucket_name = os.getenv("GCS_BUCKET_NAME", f"{project_id}-logs")
+        project_id = os.getenv("GCP_PROJECT_ID", "promptwars-c2")
+        self.bucket_name = os.getenv("GCS_BUCKET_NAME", f"voter-ai-logs-{project_id}")
         
         if not project_id:
             return
