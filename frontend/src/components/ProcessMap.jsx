@@ -3,14 +3,14 @@ import { motion } from 'framer-motion';
 
 const ProcessMap = ({ onChat }) => {
   const steps = [
-    { title: "1. Register", desc: "Get on the voter list." },
-    { title: "2. Verify", desc: "Confirm your details." },
-    { title: "3. Research", desc: "Know your candidates." },
-    { title: "4. Vote", desc: "Cast your ballot at the booth." },
-    { title: "5. EVM Security", desc: "Collection & safe storage." },
-    { title: "6. Counting", desc: "Official tallying of votes." },
-    { title: "7. Results", desc: "Declaration of the winners." },
-    { title: "8. Formation", desc: "Government takes the oath." }
+    { title: "1. Electoral Roll", desc: "Preparation and verification of voter lists." },
+    { title: "2. Announcement", desc: "Official schedule and Model Code of Conduct." },
+    { title: "3. Nominations", desc: "Filing and scrutiny of candidate papers." },
+    { title: "4. Campaigning", desc: "Political outreach and manifesto releases." },
+    { title: "5. Polling Day", desc: "Secure voting via EVM and VVPAT." },
+    { title: "6. EVM Security", desc: "Sealing and transport to strongrooms." },
+    { title: "7. Counting", desc: "Tallying of votes and declaration of results." },
+    { title: "8. Formation", desc: "Government formation and oath of office." }
   ];
 
   return (
@@ -29,6 +29,9 @@ const ProcessMap = ({ onChat }) => {
             key={i}
             whileHover={{ y: -5 }}
             className="process-card"
+            tabIndex="0"
+            role="article"
+            aria-label={`Step ${step.title}: ${step.desc}`}
           >
             <h3>{step.title}</h3>
             <p>{step.desc}</p>

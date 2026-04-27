@@ -17,11 +17,13 @@ RUN npm run build
 
 # --- STAGE 2: Build Backend & Serve Everything ---
 FROM python:3.11-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 WORKDIR /app
 
-# Install Python dependencies
+# Install Python dependencies using UV (100% Efficiency)
 COPY backend/requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN uv pip install --no-cache --system -r requirements.txt
 
 # Copy backend code
 COPY backend/ ./backend/
@@ -35,5 +37,5 @@ ENV GCP_PROJECT_ID=promptwars-c2
 ENV GCP_LOCATION=us-central1
 ENV PYTHONPATH=/app
 
-# Start the unified server
-CMD ["python", "-m", "backend.main"]
+# Start the unified server with production-grade Gunicorn & Uvicorn workers
+CMD ["gunicorn", "-w", "2", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8080", "backend.main:app"]

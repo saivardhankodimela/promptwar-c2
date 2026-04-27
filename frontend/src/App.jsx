@@ -51,7 +51,7 @@ const App = () => {
 
       <footer className="main-footer" role="contentinfo">
         <p>voter.ai — Your Personal Election Guide</p>
-        <p>A Project for <strong>Hack2Skill PromptWars Virtual</strong></p>
+        <p style={{ fontSize: '0.8rem', opacity: 0.6 }}>This is a community-driven solution for the <strong>Hack2Skill PromptWars Virtual</strong> challenge. Open to all participants.</p>
         <p>© 2026 Powered by Vertex AI | Gemini 2.5 Flash</p>
       </footer>
     </div>

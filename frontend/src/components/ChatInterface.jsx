@@ -48,7 +48,7 @@ const ChatInterface = ({ isOpen, onClose }) => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/chat', {
+      const response = await axios.post('/api/v1/chat', {
         user_id: 'unified_user',
         query: userMsg
       });
@@ -80,9 +80,12 @@ const ChatInterface = ({ isOpen, onClose }) => {
           onClick={onClose} 
           aria-label="Close Chat"
           className="close-button"
-          style={{ background: 'none', border: 'none', color: '#888', fontSize: '1.2rem', cursor: 'pointer', padding: '5px' }}
+          style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', padding: '5px' }}
         >
-          ✕
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
         </button>
       </header>
 
@@ -113,7 +116,13 @@ const ChatInterface = ({ isOpen, onClose }) => {
           </motion.div>
         ))}
         {isLoading && (
-          <div className="message-bot" style={{ fontStyle: 'italic', opacity: 0.7 }}>
+          <div 
+            className="message-bot" 
+            style={{ fontStyle: 'italic', opacity: 0.7 }}
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+          >
             voter.ai is thinking...
           </div>
         )}
@@ -127,7 +136,7 @@ const ChatInterface = ({ isOpen, onClose }) => {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask about voter IDs, dates, or process..."
-          aria-label="Type your question"
+          aria-label="Election question input"
           className="input-field"
           disabled={isLoading}
         />
